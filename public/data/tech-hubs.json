@@ -1,0 +1,26 @@
+{
+  "nodes": [
+    { "id": "silicon_valley", "lat": 37.4419, "lon": -122.1430, "name": "Silicon Valley" },
+    { "id": "seattle", "lat": 47.6062, "lon": -122.3321, "name": "Seattle" },
+    { "id": "austin", "lat": 30.2672, "lon": -97.7431, "name": "Austin" },
+    { "id": "boston", "lat": 42.3601, "lon": -71.0589, "name": "Boston" },
+    { "id": "denver", "lat": 39.7392, "lon": -104.9903, "name": "Denver" },
+    { "id": "miami", "lat": 25.7617, "lon": -80.1918, "name": "Miami" },
+    { "id": "chicago", "lat": 41.8781, "lon": -87.6298, "name": "Chicago" },
+    { "id": "atlanta", "lat": 33.7490, "lon": -84.3880, "name": "Atlanta" },
+    { "id": "phoenix", "lat": 33.4484, "lon": -112.0740, "name": "Phoenix" },
+    { "id": "portland", "lat": 45.5152, "lon": -122.6784, "name": "Portland" }
+  ],
+  "flows": [
+    { "origin": "silicon_valley", "dest": "seattle", "count": 800 },
+    { "origin": "seattle", "dest": "austin", "count": 600 },
+    { "origin": "austin", "dest": "boston", "count": 500 },
+    { "origin": "boston", "dest": "denver", "count": 400 },
+    { "origin": "denver", "dest": "miami", "count": 350 },
+    { "origin": "miami", "dest": "chicago", "count": 300 },
+    { "origin": "chicago", "dest": "atlanta", "count": 250 },
+    { "origin": "atlanta", "dest": "phoenix", "count": 200 },
+    { "origin": "phoenix", "dest": "portland", "count": 150 },
+    { "origin": "portland", "dest": "silicon_valley", "count": 900 }
+  ]
+}

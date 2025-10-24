@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Map Test with OpenStreetMap</title>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        #map { width: 100%; height: 400px; }
+        body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+    </style>
+</head>
+<body>
+    <h1>Map Test with OpenStreetMap Fallback</h1>
+    <div id="map"></div>
+    
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js"></script>
+    <script>
+        // Use a demo token that might not work
+        mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+        
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v12',
+            center: [-98, 39],
+            zoom: 3
+        });
+        
+        map.on('load', function() {
+            console.log('Mapbox style loaded successfully!');
+        });
+        
+        map.on('error', function(e) {
+            console.error('Mapbox error:', e);
+        });
+        
+        // Fallback to OpenStreetMap after 2 seconds
+        setTimeout(() => {
+            if (!map.isStyleLoaded()) {
+                console.log('Switching to OpenStreetMap...');
+                map.setStyle({
+                    version: 8,
+                    sources: {
+                        'osm': {
+                            type: 'raster',
+                            tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+                            tileSize: 256,
+                            attribution: '© OpenStreetMap contributors'
+                        }
+                    },
+                    layers: [
+                        {
+                            id: 'osm',
+                            type: 'raster',
+                            source: 'osm'
+                        }
+                    ]
+                });
+                
+                map.on('styledata', function() {
+                    if (map.isStyleLoaded()) {
+                        console.log('OpenStreetMap loaded successfully!');
+                        
+                        // Add a test marker
+                        new mapboxgl.Marker({ color: 'red' })
+                            .setLngLat([-98, 39])
+                            .setPopup(new mapboxgl.Popup().setHTML('<strong>Test Marker</strong><br>Map is working!'))
+                            .addTo(map);
+                    }
+                });
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

@@ -9,7 +9,12 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
-
+		<link href="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.css" rel="stylesheet">
+		<script src="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js"></script>
+		<style>
+		body { margin: 0; padding: 0; }
+		#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+		</style>
         <!-- Styles / Scripts -->
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -19,6 +24,305 @@
             </style>
         @endif
     </head>
-    <body class="">
+    <body>
+		<!-- Mapbox scripts -->
+		<script src="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js"></script>
+
+		<!-- Controls -->
+		<div style="padding: 20px; background: #1b1b18; color: white;">
+			<h2 style="margin-bottom: 20px;">FlowmapBlue Examples</h2>
+			<div style="display: flex; gap: 10px; flex-wrap: wrap;">
+				<button onclick="loadDataset('us-cities', event)" class="dataset-btn active">US Cities</button>
+				<button onclick="loadDataset('european-cities', event)" class="dataset-btn">European Cities</button>
+				<button onclick="loadDataset('us-airports', event)" class="dataset-btn">US Airports</button>
+				<button onclick="loadDataset('world-countries', event)" class="dataset-btn">World Countries</button>
+				<button onclick="loadDataset('tech-hubs', event)" class="dataset-btn">Tech Hubs</button>
+			</div>
+		</div>
+
+		<div id="map" style="width: 100%; height: 500px;"></div>
+
+		<style>
+			.dataset-btn {
+				padding: 10px 20px;
+				background: #3E3E3A;
+				color: white;
+				border: 1px solid #62605b;
+				border-radius: 5px;
+				cursor: pointer;
+				transition: all 0.3s;
+			}
+			.dataset-btn:hover {
+				background: #62605b;
+				border-color: white;
+			}
+			.dataset-btn.active {
+				background: #F53003;
+				border-color: #F53003;
+			}
+		</style>
+
+		<script>
+			// Set Mapbox access token (read from env). Keep empty default so we can detect missing token.
+            mapboxgl.accessToken = "{{ env('MAPBOX_TOKEN', '') }}";
+
+            // Debug: show whether a token is present (only first chars for safety)
+            console.log('Mapbox token (prefix):', mapboxgl.accessToken ? mapboxgl.accessToken.substring(0,8) + '...' : '(no token)');
+
+            // Use Mapbox style when token present; otherwise fall back to a public MapLibre style
+            const defaultMapStyle = 'mapbox://styles/mapbox/streets-v12';
+            const fallbackStyle = 'https://demotiles.maplibre.org/style.json';
+            const styleToUse = mapboxgl.accessToken ? defaultMapStyle : fallbackStyle;
+
+            let map;
+            let flowmap;
+            let currentDataset = 'us-cities';
+
+            // Initialize Mapbox/MapLibre map with better error handling
+            map = new mapboxgl.Map({
+                container: 'map',
+                style: styleToUse,
+                center: [-98, 39],
+                zoom: 3,
+                attributionControl: true
+            });
+
+            // Wait for map to load before initializing FlowmapBlue
+            map.on('load', function() {
+                console.log('Map loaded successfully');
+                loadDataset('us-cities');
+            });
+
+            map.on('error', function(e) {
+                console.error('Mapbox error:', e);
+                // Fallback to OpenStreetMap if Mapbox fails
+                if (e.error && e.error.message && e.error.message.includes('token')) {
+                    console.log('Mapbox token error, trying fallback...');
+                    map.setStyle('https://api.maptiler.com/maps/streets/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL');
+                }
+            });
+
+			// Function to load different datasets
+			async function loadDataset(datasetName, event = null) {
+				try {
+					console.log(`Loading dataset: ${datasetName}`);
+					
+					// Update active button only if event is provided (button click)
+					if (event && event.target) {
+						document.querySelectorAll('.dataset-btn').forEach(btn => btn.classList.remove('active'));
+						event.target.classList.add('active');
+					}
+
+					// Load data from JSON file
+					const response = await fetch(`/data/${datasetName}.json`);
+					console.log(`Response status: ${response.status}`);
+					
+					if (!response.ok) {
+						throw new Error(`HTTP error! status: ${response.status}`);
+					}
+					
+					const flowData = await response.json();
+					console.log('Flow data loaded:', flowData);
+
+					// Remove existing flowmap if it exists
+					if (flowmap) {
+						flowmap.remove();
+					}
+
+					// Adjust map center and zoom based on dataset
+					let center, zoom;
+					switch(datasetName) {
+						case 'us-cities':
+						case 'us-airports':
+						case 'tech-hubs':
+							center = [-98, 39];
+							zoom = 3;
+							break;
+						case 'european-cities':
+							center = [10, 50];
+							zoom = 4;
+							break;
+						case 'world-countries':
+							center = [0, 20];
+							zoom = 1;
+							break;
+						default:
+							center = [-98, 39];
+							zoom = 3;
+					}
+
+					map.flyTo({ center, zoom });
+
+					// Wait a bit for map to settle before adding visualization
+					setTimeout(() => {
+						try {
+							// Create markers and flow lines using Mapbox
+							createFlowVisualization(flowData);
+							currentDataset = datasetName;
+							console.log(`Loaded ${datasetName} dataset successfully`);
+						} catch (visualizationError) {
+							console.error('Visualization creation error:', visualizationError);
+							alert('Error creating visualization: ' + visualizationError.message);
+						}
+					}, 500);
+
+				} catch (error) {
+					console.error('Error loading dataset:', error);
+					alert('Error loading dataset: ' + error.message);
+				}
+			}
+
+			// Function to create flow visualization using Mapbox
+			function createFlowVisualization(flowData) {
+				// Clear existing layers and sources
+				if (map.getLayer('flow-lines')) {
+					map.removeLayer('flow-lines');
+				}
+				if (map.getSource('flow-lines')) {
+					map.removeSource('flow-lines');
+				}
+				if (map.getLayer('markers')) {
+					map.removeLayer('markers');
+				}
+				if (map.getSource('markers')) {
+					map.removeSource('markers');
+				}
+
+				// Create flow lines
+				const flowLines = {
+					type: 'FeatureCollection',
+					features: flowData.flows.map(flow => {
+						const originNode = flowData.nodes.find(n => n.id === flow.origin);
+						const destNode = flowData.nodes.find(n => n.id === flow.dest);
+						
+						if (!originNode || !destNode) return null;
+						
+						return {
+							type: 'Feature',
+							geometry: {
+								type: 'LineString',
+								coordinates: [
+									[originNode.lon, originNode.lat],
+									[destNode.lon, destNode.lat]
+								]
+							},
+							properties: {
+								count: flow.count,
+								origin: flow.origin,
+								dest: flow.dest
+							}
+						};
+					}).filter(Boolean)
+				};
+
+				// Create markers
+				const markers = {
+					type: 'FeatureCollection',
+					features: flowData.nodes.map(node => ({
+						type: 'Feature',
+						geometry: {
+							type: 'Point',
+							coordinates: [node.lon, node.lat]
+						},
+						properties: {
+							name: node.name,
+							id: node.id
+						}
+					}))
+				};
+
+				// Add flow lines source and layer
+				map.addSource('flow-lines', {
+					type: 'geojson',
+					data: flowLines
+				});
+
+				map.addLayer({
+					id: 'flow-lines',
+					type: 'line',
+					source: 'flow-lines',
+					layout: {
+						'line-join': 'round',
+						'line-cap': 'round'
+					},
+					paint: {
+						'line-color': '#F53003',
+						'line-width': [
+							'interpolate',
+							['linear'],
+							['get', 'count'],
+							1, 2,
+							100, 8,
+							500, 12
+						],
+						'line-opacity': 0.8
+					}
+				});
+
+				// Add markers source and layer
+				map.addSource('markers', {
+					type: 'geojson',
+					data: markers
+				});
+
+				map.addLayer({
+					id: 'markers',
+					type: 'circle',
+					source: 'markers',
+					paint: {
+						'circle-color': '#F53003',
+						'circle-radius': 8,
+						'circle-stroke-width': 2,
+						'circle-stroke-color': '#ffffff'
+					}
+				});
+
+				// Add click handlers
+				map.on('click', 'markers', function(e) {
+					const coordinates = e.features[0].geometry.coordinates.slice();
+					const name = e.features[0].properties.name;
+					
+					new mapboxgl.Popup()
+						.setLngLat(coordinates)
+						.setHTML(`<strong>${name}</strong>`)
+						.addTo(map);
+				});
+
+				map.on('click', 'flow-lines', function(e) {
+					const coordinates = e.lngLat;
+					const count = e.features[0].properties.count;
+					const origin = e.features[0].properties.origin;
+					const dest = e.features[0].properties.dest;
+					
+					new mapboxgl.Popup()
+						.setLngLat(coordinates)
+						.setHTML(`<strong>Flow:</strong> ${origin} → ${dest}<br><strong>Count:</strong> ${count}`)
+						.addTo(map);
+				});
+
+				// Change cursor on hover
+				map.on('mouseenter', 'markers', function() {
+					map.getCanvas().style.cursor = 'pointer';
+				});
+
+				map.on('mouseleave', 'markers', function() {
+					map.getCanvas().style.cursor = '';
+				});
+
+				map.on('mouseenter', 'flow-lines', function() {
+					map.getCanvas().style.cursor = 'pointer';
+				});
+
+				map.on('mouseleave', 'flow-lines', function() {
+					map.getCanvas().style.cursor = '';
+				});
+			}
+
+			// Error handling
+			map.on('error', function(e) {
+				console.error('Mapbox error:', e);
+			});
+		</script>
+
     </body>
 </html>

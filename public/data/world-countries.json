@@ -1,0 +1,26 @@
+{
+  "nodes": [
+    { "id": "usa", "lat": 39.8283, "lon": -98.5795, "name": "United States" },
+    { "id": "china", "lat": 35.8617, "lon": 104.1954, "name": "China" },
+    { "id": "india", "lat": 20.5937, "lon": 78.9629, "name": "India" },
+    { "id": "brazil", "lat": -14.2350, "lon": -51.9253, "name": "Brazil" },
+    { "id": "russia", "lat": 61.5240, "lon": 105.3188, "name": "Russia" },
+    { "id": "japan", "lat": 36.2048, "lon": 138.2529, "name": "Japan" },
+    { "id": "germany", "lat": 51.1657, "lon": 10.4515, "name": "Germany" },
+    { "id": "uk", "lat": 55.3781, "lon": -3.4360, "name": "United Kingdom" },
+    { "id": "france", "lat": 46.2276, "lon": 2.2137, "name": "France" },
+    { "id": "italy", "lat": 41.8719, "lon": 12.5674, "name": "Italy" }
+  ],
+  "flows": [
+    { "origin": "usa", "dest": "china", "count": 500 },
+    { "origin": "china", "dest": "india", "count": 450 },
+    { "origin": "india", "dest": "brazil", "count": 400 },
+    { "origin": "brazil", "dest": "russia", "count": 350 },
+    { "origin": "russia", "dest": "japan", "count": 300 },
+    { "origin": "japan", "dest": "germany", "count": 250 },
+    { "origin": "germany", "dest": "uk", "count": 200 },
+    { "origin": "uk", "dest": "france", "count": 150 },
+    { "origin": "france", "dest": "italy", "count": 100 },
+    { "origin": "italy", "dest": "usa", "count": 550 }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "nodes": [
+    { "id": "london", "lat": 51.5074, "lon": -0.1278, "name": "London" },
+    { "id": "paris", "lat": 48.8566, "lon": 2.3522, "name": "Paris" },
+    { "id": "berlin", "lat": 52.5200, "lon": 13.4050, "name": "Berlin" },
+    { "id": "madrid", "lat": 40.4168, "lon": -3.7038, "name": "Madrid" },
+    { "id": "rome", "lat": 41.9028, "lon": 12.4964, "name": "Rome" },
+    { "id": "amsterdam", "lat": 52.3676, "lon": 4.9041, "name": "Amsterdam" },
+    { "id": "vienna", "lat": 48.2082, "lon": 16.3738, "name": "Vienna" },
+    { "id": "prague", "lat": 50.0755, "lon": 14.4378, "name": "Prague" },
+    { "id": "budapest", "lat": 47.4979, "lon": 19.0402, "name": "Budapest" },
+    { "id": "warsaw", "lat": 52.2297, "lon": 21.0122, "name": "Warsaw" }
+  ],
+  "flows": [
+    { "origin": "london", "dest": "paris", "count": 200 },
+    { "origin": "paris", "dest": "berlin", "count": 180 },
+    { "origin": "berlin", "dest": "madrid", "count": 160 },
+    { "origin": "madrid", "dest": "rome", "count": 140 },
+    { "origin": "rome", "dest": "amsterdam", "count": 120 },
+    { "origin": "amsterdam", "dest": "vienna", "count": 100 },
+    { "origin": "vienna", "dest": "prague", "count": 80 },
+    { "origin": "prague", "dest": "budapest", "count": 60 },
+    { "origin": "budapest", "dest": "warsaw", "count": 40 },
+    { "origin": "warsaw", "dest": "london", "count": 220 }
+  ]
+}

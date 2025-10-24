@@ -1,0 +1,26 @@
+{
+  "nodes": [
+    { "id": "jfk", "lat": 40.6413, "lon": -73.7781, "name": "JFK Airport" },
+    { "id": "lax", "lat": 33.9425, "lon": -118.4081, "name": "LAX Airport" },
+    { "id": "ord", "lat": 41.9786, "lon": -87.9048, "name": "O'Hare Airport" },
+    { "id": "dfw", "lat": 32.8968, "lon": -97.0380, "name": "DFW Airport" },
+    { "id": "den", "lat": 39.8561, "lon": -104.6737, "name": "Denver Airport" },
+    { "id": "atl", "lat": 33.6407, "lon": -84.4277, "name": "Atlanta Airport" },
+    { "id": "sea", "lat": 47.4502, "lon": -122.3088, "name": "Seattle Airport" },
+    { "id": "mia", "lat": 25.7959, "lon": -80.2870, "name": "Miami Airport" },
+    { "id": "phx", "lat": 33.4342, "lon": -112.0116, "name": "Phoenix Airport" },
+    { "id": "las", "lat": 36.0840, "lon": -115.1537, "name": "Las Vegas Airport" }
+  ],
+  "flows": [
+    { "origin": "jfk", "dest": "lax", "count": 300 },
+    { "origin": "lax", "dest": "ord", "count": 250 },
+    { "origin": "ord", "dest": "dfw", "count": 200 },
+    { "origin": "dfw", "dest": "den", "count": 180 },
+    { "origin": "den", "dest": "atl", "count": 160 },
+    { "origin": "atl", "dest": "sea", "count": 140 },
+    { "origin": "sea", "dest": "mia", "count": 120 },
+    { "origin": "mia", "dest": "phx", "count": 100 },
+    { "origin": "phx", "dest": "las", "count": 80 },
+    { "origin": "las", "dest": "jfk", "count": 320 }
+  ]
+}

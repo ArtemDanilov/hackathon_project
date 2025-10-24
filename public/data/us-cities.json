@@ -1,0 +1,26 @@
+{
+  "nodes": [
+    { "id": "new_york", "lat": 40.7128, "lon": -74.0060, "name": "New York" },
+    { "id": "los_angeles", "lat": 34.0522, "lon": -118.2437, "name": "Los Angeles" },
+    { "id": "chicago", "lat": 41.8781, "lon": -87.6298, "name": "Chicago" },
+    { "id": "houston", "lat": 29.7604, "lon": -95.3698, "name": "Houston" },
+    { "id": "phoenix", "lat": 33.4484, "lon": -112.0740, "name": "Phoenix" },
+    { "id": "philadelphia", "lat": 39.9526, "lon": -75.1652, "name": "Philadelphia" },
+    { "id": "san_antonio", "lat": 29.4241, "lon": -98.4936, "name": "San Antonio" },
+    { "id": "san_diego", "lat": 32.7157, "lon": -117.1611, "name": "San Diego" },
+    { "id": "dallas", "lat": 32.7767, "lon": -96.7970, "name": "Dallas" },
+    { "id": "san_jose", "lat": 37.3382, "lon": -121.8863, "name": "San Jose" }
+  ],
+  "flows": [
+    { "origin": "new_york", "dest": "los_angeles", "count": 150 },
+    { "origin": "chicago", "dest": "houston", "count": 120 },
+    { "origin": "phoenix", "dest": "new_york", "count": 80 },
+    { "origin": "los_angeles", "dest": "chicago", "count": 90 },
+    { "origin": "philadelphia", "dest": "san_antonio", "count": 60 },
+    { "origin": "san_diego", "dest": "dallas", "count": 70 },
+    { "origin": "san_jose", "dest": "phoenix", "count": 45 },
+    { "origin": "houston", "dest": "san_diego", "count": 55 },
+    { "origin": "dallas", "dest": "philadelphia", "count": 65 },
+    { "origin": "san_antonio", "dest": "san_jose", "count": 40 }
+  ]
+}
